@@ -50,7 +50,7 @@ aws s3api put-bucket-lifecycle-configuration \
 ```
 
 ## STEP 3 — IAM ROLE (IRSA for Fluent Bit)  
-**Create Policy**  
+**Create Policy`fluent-bit-policy.json`**  
 ```bash
 cat <<EOF > fluent-bit-policy.json
 {
