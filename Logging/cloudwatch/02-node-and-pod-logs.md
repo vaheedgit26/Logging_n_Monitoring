@@ -275,6 +275,16 @@ kubectl logs -n amazon-cloudwatch <fluent-bit-pod>
 | ❄️ Cold    | S3 GLACIER      | 90–180 days |  
 | 🧊 Archive | S3 DEEP_ARCHIVE | 180+ days    |  
 
+## ⚖️ Balance Between Cost vs Access  
+| Stage        | Access Speed | Cost        | Usage             |  
+| ------------ | ------------ | ----------- | ----------------- |  
+| CloudWatch   | Instant      | 💸 High     | Debugging         |  
+| S3 Standard  | Fast         | 💰 Medium   | Recent logs       |  
+| Standard IA  | Medium       | 💵 Low      | Occasional access |  
+| Glacier      | Slow         | 🪙 Very low | Rare              |  
+| Deep Archive | Very slow    | 🧊 Cheapest | Compliance        |  
+
+
 ## 🚨 ZERO-MISS CHECKLIST  
 ✔ IRSA configured  
 ✔ Fluent Bit DaemonSet running  
