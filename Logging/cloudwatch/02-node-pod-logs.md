@@ -25,11 +25,12 @@ aws s3api create-bucket \
   --region us-east-1
 ```
 
-## STEP 2 — Add Lifecycle Policy 
-Stage 	Storage 	Duration
-🔥 Hot 	CloudWatch 	15 days
-🌤️ Warm 	S3 STANDARD_IA 	15–90 days
-❄️ Cold 	Glacier / Deep Archive 	90+ days
+## STEP 2 — Add Lifecycle Policy   
+| Stage    | Storage                | Duration   |  
+| -------- | ---------------------- | ---------- |  
+| 🔥 Hot   | CloudWatch             | 15 days    |  
+| 🌤️ Warm | S3 STANDARD_IA         | 15–90 days |  
+| ❄️ Cold  | Glacier / Deep Archive | 90+ days   |  
 `lifecycle.json` 
 ```bash
 cat <<EOF > lifecycle.json
