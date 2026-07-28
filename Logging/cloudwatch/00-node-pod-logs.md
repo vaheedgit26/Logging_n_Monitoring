@@ -473,8 +473,6 @@ daemonSetVolumes:
 # ======================================================
 
 daemonSetVolumeMounts:
-
-
   # Node logs
   - name: varlog
     mountPath: /var/log
