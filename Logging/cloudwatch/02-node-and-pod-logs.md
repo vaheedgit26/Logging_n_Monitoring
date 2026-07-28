@@ -29,10 +29,10 @@ aws s3api create-bucket \
 | Stage      | Service         | Duration     |  
 | ---------- | --------------- | ------------ |  
 | 🔥 Hot     | CloudWatch      | 0–15 days    |  
-| 📦 Warm    | S3 STANDARD     | 0–90 days    |  
-| 💾 Cooler  | S3 STANDARD_IA  | 90–180 days  |  
-| ❄️ Cold    | S3 GLACIER      | 180–365 days |  
-| 🧊 Archive | S3 DEEP_ARCHIVE | 365+ days    |  
+| 📦 Warm    | S3 STANDARD     | 0–30 days    |  
+| 💾 Cooler  | S3 STANDARD_IA  | 30–90 days  |  
+| ❄️ Cold    | S3 GLACIER      | 90–180 days |  
+| 🧊 Archive | S3 DEEP_ARCHIVE | 180+ days    |  
 
 
 `lifecycle.json` 
@@ -44,9 +44,9 @@ cat <<EOF > lifecycle.json
       "ID": "log-lifecycle",
       "Status": "Enabled",
       "Transitions": [
-        { "Days": 90, "StorageClass": "STANDARD_IA" },
-        { "Days": 180, "StorageClass": "GLACIER" },
-        { "Days": 365, "StorageClass": "DEEP_ARCHIVE" }
+        { "Days": 30, "StorageClass": "STANDARD_IA" },
+        { "Days": 90, "StorageClass": "GLACIER" },
+        { "Days": 180, "StorageClass": "DEEP_ARCHIVE" }
       ]
     }
   ]
@@ -267,13 +267,13 @@ kubectl logs -n amazon-cloudwatch <fluent-bit-pod>
  - /var/log/containers/*.log
 
 ## 📦 FINAL STORAGE STRATEGY  
-| Stage      | Service         | Duration     |
-| ---------- | --------------- | ------------ |
-| 🔥 Hot     | CloudWatch      | 0–15 days    |
-| 📦 Warm    | S3 STANDARD     | 0–90 days    |
-| 💾 Cooler  | S3 STANDARD_IA  | 90–180 days  |
-| ❄️ Cold    | S3 GLACIER      | 180–365 days |
-| 🧊 Archive | S3 DEEP_ARCHIVE | 365+ days    |
+| Stage      | Service         | Duration     |  
+| ---------- | --------------- | ------------ |  
+| 🔥 Hot     | CloudWatch      | 0–15 days    |  
+| 📦 Warm    | S3 STANDARD     | 0–30 days    |  
+| 💾 Cooler  | S3 STANDARD_IA  | 30–90 days  |  
+| ❄️ Cold    | S3 GLACIER      | 90–180 days |  
+| 🧊 Archive | S3 DEEP_ARCHIVE | 180+ days    |  
 
 ## 🚨 ZERO-MISS CHECKLIST  
 ✔ IRSA configured  
