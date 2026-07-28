@@ -25,7 +25,7 @@ aws s3api create-bucket \
   --region us-east-1
 ```
 
-## STEP 2 — Add Lifecycle Policy  
+## STEP 2 — Add Lifecycle Policy `log-lifecycle` 
 ```bash
 cat <<EOF > lifecycle.json
 {
