@@ -216,67 +216,114 @@ helm repo update
 ```
 **values.yaml (IMPORTANT — includes node logs)**  
 ```yaml
+# ======================================================
+# RBAC
+# Required for Kubernetes metadata enrichment
+# ======================================================
+
 rbac:
   create: true
 
-# ==========================================
+
+# ======================================================
 # Service Account
-# ==========================================
+# ======================================================
+# For production add IRSA annotation
+# ======================================================
+
 serviceAccount:
   create: true
   name: aws-for-fluent-bit
 
+  # Uncomment after creating IAM Role for Fluent Bit
+  #
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/fluent-bit-cloudwatch-role
 
-# ==========================================
+
+
+# ======================================================
+# Run Fluent Bit on every node
+# ======================================================
+
+tolerations:
+  - operator: Exists
+
+
+# Required for node/systemd log collection
+
+hostNetwork: true
+
+dnsPolicy: ClusterFirstWithHostNet
+
+
+
+# ======================================================
 # Fluent Bit Configuration
-# ==========================================
+# ======================================================
 
 config:
 
+  # ----------------------------------------------------
+  # SERVICE
+  # ----------------------------------------------------
+
   service: |
+
     [SERVICE]
         Flush                     5
         Log_Level                 info
-        Daemon                    off
+        Daemon                    Off
         Parsers_File              parsers.conf
+
         HTTP_Server               On
         HTTP_Listen               0.0.0.0
         HTTP_PORT                 2020
 
 
-  # ======================================
+
+  # ====================================================
   # INPUTS
-  # ======================================
+  # ====================================================
 
   inputs: |
 
-    # --------------------------------------
-    # POD LOGS
-    # --------------------------------------
+
+    # --------------------------------------------------
+    # 1. POD LOGS
+    # --------------------------------------------------
+    #
     # Source:
     # /var/log/containers/*.log
     #
-    # Contains:
-    # application stdout/stderr logs
+    # Kubernetes application stdout/stderr logs
+    #
+    # EKS uses containerd, therefore CRI parser
     #
 
     [INPUT]
+
         Name              tail
         Tag               kube.*
         Path              /var/log/containers/*.log
-        Parser            cri   # docker
+        Parser            cri
         DB                /var/lib/fluent-bit/flb_kube.db
-        # DB                /var/log/flb_kube.db
         Mem_Buf_Limit     50MB
         Skip_Long_Lines   On
         Refresh_Interval  10
 
-
-    # --------------------------------------
-    # NODE LOGS
-    # --------------------------------------
+    # --------------------------------------------------
+    # 2. NODE OS LOGS
+    # --------------------------------------------------
+    #
     # Amazon Linux:
+    #
     # /var/log/messages
+    #
+    # Contains:
+    # kernel
+    # OS events
+    # system messages
     #
 
     [INPUT]
@@ -284,18 +331,22 @@ config:
         Tag               node.messages
         Path              /var/log/messages
         DB                /var/lib/fluent-bit/flb_node.db
-        # DB                /var/log/flb_node.db
         Mem_Buf_Limit     20MB
         Skip_Long_Lines   On
         Refresh_Interval  10
 
-
-    # --------------------------------------
-    # SYSTEMD LOGS
-    # --------------------------------------
+    # --------------------------------------------------
+    # 3. SYSTEMD JOURNAL LOGS
+    # --------------------------------------------------
+    #
     # Collect:
-    # kubelet.service
-    # containerd.service
+    #
+    # kubelet
+    # containerd
+    #
+    # from:
+    #
+    # /run/log/journal
     #
 
     [INPUT]
@@ -304,42 +355,45 @@ config:
         DB                /var/lib/fluent-bit/flb_systemd.db
         Systemd_Filter    _SYSTEMD_UNIT=kubelet.service
         Systemd_Filter    _SYSTEMD_UNIT=containerd.service
-        Systemd_Filter    _SYSTEMD_UNIT=docker.service
         Read_From_Tail    On
 
-
-  # ======================================
+  # ====================================================
   # FILTERS
-  # ======================================
+  # ====================================================
 
   filters: |
 
-    # Add Kubernetes metadata
+    # --------------------------------------------------
+    # Kubernetes Metadata
+    # --------------------------------------------------
+    #
+    # Adds:
+    #
     # namespace
     # pod name
     # container name
+    # labels
+    #
 
     [FILTER]
         Name                kubernetes
         Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
         Merge_Log           On
         Keep_Log            Off
-        Kube_Tag_Prefix     kube.var.log.containers.
         Labels              On
         Annotations         Off
 
-
-
-  # ======================================
+  # ====================================================
   # OUTPUTS
-  # ======================================
+  # ====================================================
 
   outputs: |
 
-
-    # --------------------------------------
-    # POD LOGS TO CLOUDWATCH
-    # --------------------------------------
+    # --------------------------------------------------
+    # POD LOGS
+    # Fluent Bit --> CloudWatch
+    # --------------------------------------------------
 
     [OUTPUT]
         Name                cloudwatch_logs
@@ -349,11 +403,10 @@ config:
         log_stream_prefix   pod-
         auto_create_group   true
 
-
-
-    # --------------------------------------
-    # NODE FILE LOGS TO CLOUDWATCH
-    # --------------------------------------
+    # --------------------------------------------------
+    # NODE /var/log/messages
+    # Fluent Bit --> CloudWatch
+    # --------------------------------------------------
 
     [OUTPUT]
         Name                cloudwatch_logs
@@ -363,11 +416,10 @@ config:
         log_stream_prefix   node-
         auto_create_group   true
 
-
-
-    # --------------------------------------
-    # SYSTEMD LOGS TO CLOUDWATCH
-    # --------------------------------------
+    # --------------------------------------------------
+    # SYSTEMD LOGS
+    # Fluent Bit --> CloudWatch
+    # --------------------------------------------------
 
     [OUTPUT]
         Name                cloudwatch_logs
@@ -377,47 +429,68 @@ config:
         log_stream_prefix   systemd-
         auto_create_group   true
 
-
-
-# ==========================================
-# Mount Host Paths
-# ==========================================
+# ======================================================
+# Host Volumes
+# ======================================================
 
 daemonSetVolumes:
+  # --------------------------------------
+  # Node log directory
+  # --------------------------------------
 
   - name: varlog
     hostPath:
       path: /var/log
+      type: Directory
 
+  # --------------------------------------
+  # systemd journal
+  # --------------------------------------
 
   - name: systemd
     hostPath:
       path: /run/log/journal
+      type: Directory
 
+  # --------------------------------------
+  # Node identity
+  # --------------------------------------
 
   - name: machine-id
     hostPath:
       path: /etc/machine-id
+      type: File
+
+  # --------------------------------------
+  # Fluent Bit state database
+  # --------------------------------------
 
   - name: fluent-bit-state
     emptyDir: {}
 
+# ======================================================
+# Volume Mounts inside Fluent Bit container
+# ======================================================
+
 daemonSetVolumeMounts:
 
+
+  # Node logs
   - name: varlog
     mountPath: /var/log
     readOnly: true
 
-
+  # systemd journal
   - name: systemd
     mountPath: /run/log/journal
     readOnly: true
 
-
+  # node identity
   - name: machine-id
     mountPath: /etc/machine-id
     readOnly: true
 
+  # Fluent Bit DB files
   - name: fluent-bit-state
     mountPath: /var/lib/fluent-bit
 ```
