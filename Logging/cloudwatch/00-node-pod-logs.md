@@ -209,7 +209,7 @@ aws logs put-subscription-filter \
   --role-arn arn:aws:iam::<ACCOUNT_ID>:role/cw-to-firehose-role
 ```
 ## ✅ STEP 8 — IRSA setup for Fluent Bit
-**Create IAM Policy for Fluent Bit`fluent-bit-cloudwatch-policy.json`**  
+**Create IAM Policy for Fluent Bit  `fluent-bit-cloudwatch-policy.json`**  
 ```bash
 cat <<EOF > fluent-bit-cloudwatch-policy.json
 {
