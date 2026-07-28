@@ -268,8 +268,7 @@ helm install fluent-bit eks/aws-for-fluent-bit -f values.yaml -n kube-system
 | 90+       | GLACIER      |  
 | 180+      | DEEP_ARCHIVE |  
 
-✅ YOU NOW HAVE  
-
+## ✅ YOU NOW HAVE  
 ✔ Pod logs  
 ✔ Node logs  
 ✔ CloudWatch (hot 15 days)  
