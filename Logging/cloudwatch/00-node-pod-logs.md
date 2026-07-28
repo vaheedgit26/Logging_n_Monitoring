@@ -208,7 +208,8 @@ aws logs put-subscription-filter \
   --destination-arn arn:aws:firehose:us-east-1:<ACCOUNT_ID>:deliverystream/eks-logs-firehose \
   --role-arn arn:aws:iam::<ACCOUNT_ID>:role/cw-to-firehose-role
 ```
-## ✅ STEP 8 — Create IAM Policy for Fluent Bit  
+## ✅ STEP 8 — IRSA setup for Fluent Bit
+**Create IAM Policy for Fluent Bit**  
 ```bash
 cat <<EOF > fluent-bit-cloudwatch-policy.json
 {
@@ -294,7 +295,7 @@ serviceAccount:
 ```
 **Now Fluent Bit gets AWS credentials automatically.**
 
-## ✅ STEP 8 — Install Fluent Bit (EKS)  
+## ✅ STEP 9 — Install Fluent Bit (EKS)  
 ```bash
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
