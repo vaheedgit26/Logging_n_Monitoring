@@ -196,7 +196,7 @@ aws firehose create-delivery-stream \
   "CompressionFormat": "GZIP"
 }
 ```
-## 7. Connect CloudWatch → Firehose**  
+## 7. Connect CloudWatch → Firehose  
 ```bash
 aws logs put-subscription-filter \
   --log-group-name "/eks/prod-logs" \
@@ -205,7 +205,7 @@ aws logs put-subscription-filter \
   --destination-arn arn:aws:firehose:ap-south-1:<ACCOUNT_ID>:deliverystream/eks-logs-stream
 ```
 
-## 8. Final Data Flow (Exact Behaviour)**  
+## 8. Final Data Flow (Exact Behaviour)  
 ```text
 Fluent Bit → CloudWatch (0–90 days)
 
@@ -219,7 +219,7 @@ S3 Lifecycle:
 365+ → Deep Archive
 ```
 
-## ⚠️ 9. Production MUST-DO Checklist**  
+## ⚠️ 9. Production MUST-DO Checklist  
 **✅ Security**  
 - Enable S3 encryption:
 ```bash
