@@ -183,7 +183,7 @@ aws firehose create-delivery-stream \
   --s3-destination-configuration file://firehose.json
 ```
 
-**6.3 firehose.json**  
+**6.3 `firehose.json`**  
 ```json
 {
   "RoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/FirehoseRole",
