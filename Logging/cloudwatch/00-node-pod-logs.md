@@ -208,6 +208,90 @@ aws logs put-subscription-filter \
   --destination-arn arn:aws:firehose:us-east-1:<ACCOUNT_ID>:deliverystream/eks-logs-firehose \
   --role-arn arn:aws:iam::<ACCOUNT_ID>:role/cw-to-firehose-role
 ```
+## ✅ STEP 8 — Create IAM Policy for Fluent Bit  
+```bash
+cat <<EOF > fluent-bit-cloudwatch-policy.json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+```
+**Create policy:**  
+```bash
+aws iam create-policy \
+--policy-name fluent-bit-cloudwatch-policy \
+--policy-document file://fluent-bit-cloudwatch-policy.json
+```
+**You will get:** 
+```bash
+arn:aws:iam::<ACCOUNT_ID>:policy/fluent-bit-cloudwatch-policy
+```
+**Create IAM Role for IRSA**  
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub": "system:serviceaccount:amazon-cloudwatch:aws-for-fluent-bit"
+        }
+      }
+    }
+  ]
+}
+```
+**Important part:**  
+```json
+"sub": "system:serviceaccount:amazon-cloudwatch:aws-for-fluent-bit"
+```
+**This must match:**  
+```json
+serviceAccount:
+  name: aws-for-fluent-bit
+```
+and your namespace
+
+**Attach Policy to Role**  
+```bash
+aws iam attach-role-policy \
+--role-name fluent-bit-cloudwatch-role \
+--policy-arn arn:aws:iam::<ACCOUNT_ID>:policy/fluent-bit-cloudwatch-policy
+```
+**Update your values.yaml**  
+```yaml
+serviceAccount:
+  create: true
+  name: aws-for-fluent-bit
+```
+**to**  
+```yaml
+serviceAccount:
+  create: true
+  name: aws-for-fluent-bit
+
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/fluent-bit-cloudwatch-role
+```
+**Now Fluent Bit gets AWS credentials automatically.**
 
 ## ✅ STEP 8 — Install Fluent Bit (EKS)  
 ```bash
@@ -279,8 +363,6 @@ config:
         HTTP_Server               On
         HTTP_Listen               0.0.0.0
         HTTP_PORT                 2020
-
-
 
   # ====================================================
   # INPUTS
