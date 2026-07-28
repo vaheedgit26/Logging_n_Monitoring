@@ -26,11 +26,14 @@ aws s3api create-bucket \
 ```
 
 ## STEP 2 — Add Lifecycle Policy   
-| Stage    | Storage                | Duration   |  
-| -------- | ---------------------- | ---------- |  
-| 🔥 Hot   | CloudWatch             | 15 days    |  
-| 🌤️ Warm | S3 STANDARD_IA         | 15–90 days |  
-| ❄️ Cold  | Glacier / Deep Archive | 90+ days   | 
+| Stage      | Service         | Duration     |  
+| ---------- | --------------- | ------------ |  
+| 🔥 Hot     | CloudWatch      | 0–15 days    |  
+| 📦 Warm    | S3 STANDARD     | 0–90 days    |  
+| 💾 Cooler  | S3 STANDARD_IA  | 90–180 days  |  
+| ❄️ Cold    | S3 GLACIER      | 180–365 days |  
+| 🧊 Archive | S3 DEEP_ARCHIVE | 365+ days    |  
+
 
 `lifecycle.json` 
 ```bash
@@ -41,8 +44,8 @@ cat <<EOF > lifecycle.json
       "ID": "log-lifecycle",
       "Status": "Enabled",
       "Transitions": [
-        { "Days": 15, "StorageClass": "STANDARD_IA" },
-        { "Days": 90, "StorageClass": "GLACIER" },
+        { "Days": 90, "StorageClass": "STANDARD_IA" },
+        { "Days": 180, "StorageClass": "GLACIER" },
         { "Days": 365, "StorageClass": "DEEP_ARCHIVE" }
       ]
     }
