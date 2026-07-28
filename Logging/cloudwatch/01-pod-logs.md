@@ -147,9 +147,11 @@ Save as `lifecycle.json`**
 }
 ```
 **Apply:**  
+```bash
 aws s3api put-bucket-lifecycle-configuration \
   --bucket eks-prod-logs-<ACCOUNT_ID> \
   --lifecycle-configuration file://lifecycle.json
+```
 
 ## 6. Create Firehose Delivery Stream   
 **6.1 IAM Role for Firehose** 
