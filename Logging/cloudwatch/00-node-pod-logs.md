@@ -264,11 +264,12 @@ arn:aws:iam::<ACCOUNT_ID>:policy/fluent-bit-cloudwatch-policy
 "sub": "system:serviceaccount:amazon-cloudwatch:aws-for-fluent-bit"
 ```
 **This must match:**  
-```json
+```yaml
 serviceAccount:
   name: aws-for-fluent-bit
 ```
 and your namespace
+
 
 **Attach Policy to Role**  
 ```bash
