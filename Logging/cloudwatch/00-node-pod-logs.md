@@ -279,7 +279,8 @@ config:
         Name              tail
         Tag               node.messages
         Path              /var/log/messages
-        DB                /var/log/flb_node.db
+        DB                /var/lib/fluent-bit/flb_kube.db
+        # DB                /var/log/flb_node.db
         Mem_Buf_Limit     20MB
         Skip_Long_Lines   On
         Refresh_Interval  10
@@ -393,11 +394,14 @@ daemonSetVolumes:
     hostPath:
       path: /etc/machine-id
 
+  - name: fluent-bit-state
+    emptyDir: {}
 
 daemonSetVolumeMounts:
 
   - name: varlog
     mountPath: /var/log
+    readOnly: true
 
 
   - name: systemd
@@ -408,6 +412,9 @@ daemonSetVolumeMounts:
   - name: machine-id
     mountPath: /etc/machine-id
     readOnly: true
+
+  - name: fluent-bit-state
+    mountPath: /var/lib/fluent-bit
 ```
 **Install:**  
 ```bash
