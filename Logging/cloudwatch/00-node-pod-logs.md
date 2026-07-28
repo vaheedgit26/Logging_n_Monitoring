@@ -75,7 +75,7 @@ aws iam create-role \
   --role-name firehose-role \
   --assume-role-policy-document file://firehose-trust.json
 ```
-Attach Policy:  
+**Attach Policy:**  
 ```bash
 cat <<EOF > firehose-policy.json
 {
@@ -125,7 +125,7 @@ cat <<EOF > firehose.json
 }
 EOF
 ```
-Create:  
+**Create:**  
 ```bash
 aws firehose create-delivery-stream --cli-input-json file://firehose.json
 ```
@@ -135,7 +135,7 @@ aws firehose create-delivery-stream --cli-input-json file://firehose.json
 aws logs create-log-group --log-group-name "/eks/pod-logs"
 aws logs create-log-group --log-group-name "/eks/node-logs"
 ```
-Set retention:  
+**Set retention:**  
 ```bash
 aws logs put-retention-policy \
   --log-group-name "/eks/pod-logs" \
@@ -166,7 +166,7 @@ aws iam create-role \
   --role-name cw-to-firehose-role \
   --assume-role-policy-document file://cw-trust.json
 ````
-Policy:  
+**Policy:**  
 ```bash
 cat <<EOF > cw-policy.json
 {
@@ -247,7 +247,7 @@ extraOutputs: |
       log_group_name /eks/node-logs
       log_stream_prefix node-
 ```
-Install:  
+**Install:**  
 ```bash
 helm install fluent-bit eks/aws-for-fluent-bit -f values.yaml -n kube-system
 ```
@@ -269,6 +269,7 @@ helm install fluent-bit eks/aws-for-fluent-bit -f values.yaml -n kube-system
 | 180+      | DEEP_ARCHIVE |  
 
 ✅ YOU NOW HAVE  
+
 ✔ Pod logs  
 ✔ Node logs  
 ✔ CloudWatch (hot 15 days)  
