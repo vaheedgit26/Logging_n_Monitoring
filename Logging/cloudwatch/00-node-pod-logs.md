@@ -216,6 +216,9 @@ helm repo update
 ```
 **values.yaml (IMPORTANT — includes node logs)**  
 ```yaml
+rbac:
+  create: true
+
 # ==========================================
 # Service Account
 # ==========================================
@@ -261,7 +264,7 @@ config:
         Name              tail
         Tag               kube.*
         Path              /var/log/containers/*.log
-        Parser            docker
+        Parser            cri   # docker
         DB                /var/lib/fluent-bit/flb_kube.db
         # DB                /var/log/flb_kube.db
         Mem_Buf_Limit     50MB
@@ -280,7 +283,7 @@ config:
         Name              tail
         Tag               node.messages
         Path              /var/log/messages
-        DB                /var/lib/fluent-bit/flb_kube.db
+        DB                /var/lib/fluent-bit/flb_node.db
         # DB                /var/log/flb_node.db
         Mem_Buf_Limit     20MB
         Skip_Long_Lines   On
@@ -298,6 +301,7 @@ config:
     [INPUT]
         Name              systemd
         Tag               node.systemd
+        DB                /var/lib/fluent-bit/flb_systemd.db
         Systemd_Filter    _SYSTEMD_UNIT=kubelet.service
         Systemd_Filter    _SYSTEMD_UNIT=containerd.service
         Systemd_Filter    _SYSTEMD_UNIT=docker.service
