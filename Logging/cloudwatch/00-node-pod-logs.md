@@ -216,40 +216,210 @@ helm repo update
 ```
 **values.yaml (IMPORTANT — includes node logs)**  
 ```yaml
-cloudWatch:
-  region: us-east-1
-  logGroupName: /eks/pod-logs
-
+# ==========================================
+# Service Account
+# ==========================================
 serviceAccount:
   create: true
-  name: fluent-bit
+  name: aws-for-fluent-bit
 
-input:
-  tail:
-    enabled: true
-    path: /var/log/containers/*.log
 
-  systemd:
-    enabled: true
+# ==========================================
+# Fluent Bit Configuration
+# ==========================================
 
-extraInputs: |
-  [INPUT]
-      Name tail
-      Path /var/log/messages
-      Tag node.logs
-      Refresh_Interval 5
+config:
 
-extraOutputs: |
-  [OUTPUT]
-      Name cloudwatch_logs
-      Match node.logs
-      region us-east-1
-      log_group_name /eks/node-logs
-      log_stream_prefix node-
+  service: |
+    [SERVICE]
+        Flush                     5
+        Log_Level                 info
+        Daemon                    off
+        Parsers_File              parsers.conf
+        HTTP_Server               On
+        HTTP_Listen               0.0.0.0
+        HTTP_PORT                 2020
+
+
+  # ======================================
+  # INPUTS
+  # ======================================
+
+  inputs: |
+
+    # --------------------------------------
+    # POD LOGS
+    # --------------------------------------
+    # Source:
+    # /var/log/containers/*.log
+    #
+    # Contains:
+    # application stdout/stderr logs
+    #
+
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        Parser            docker
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+
+    # --------------------------------------
+    # NODE LOGS
+    # --------------------------------------
+    # Amazon Linux:
+    # /var/log/messages
+    #
+
+    [INPUT]
+        Name              tail
+        Tag               node.messages
+        Path              /var/log/messages
+        DB                /var/log/flb_node.db
+        Mem_Buf_Limit     20MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+
+    # --------------------------------------
+    # SYSTEMD LOGS
+    # --------------------------------------
+    # Collect:
+    # kubelet.service
+    # containerd.service
+    #
+
+    [INPUT]
+        Name              systemd
+        Tag               node.systemd
+        Systemd_Filter    _SYSTEMD_UNIT=kubelet.service
+        Systemd_Filter    _SYSTEMD_UNIT=containerd.service
+        Systemd_Filter    _SYSTEMD_UNIT=docker.service
+        Read_From_Tail    On
+
+
+  # ======================================
+  # FILTERS
+  # ======================================
+
+  filters: |
+
+    # Add Kubernetes metadata
+    # namespace
+    # pod name
+    # container name
+
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Merge_Log           On
+        Keep_Log            Off
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Labels              On
+        Annotations         Off
+
+
+
+  # ======================================
+  # OUTPUTS
+  # ======================================
+
+  outputs: |
+
+
+    # --------------------------------------
+    # POD LOGS TO CLOUDWATCH
+    # --------------------------------------
+
+    [OUTPUT]
+        Name                cloudwatch_logs
+        Match               kube.*
+        region              us-east-1
+        log_group_name      /eks/pod-logs
+        log_stream_prefix   pod-
+        auto_create_group   true
+
+
+
+    # --------------------------------------
+    # NODE FILE LOGS TO CLOUDWATCH
+    # --------------------------------------
+
+    [OUTPUT]
+        Name                cloudwatch_logs
+        Match               node.messages
+        region              us-east-1
+        log_group_name      /eks/node-logs
+        log_stream_prefix   node-
+        auto_create_group   true
+
+
+
+    # --------------------------------------
+    # SYSTEMD LOGS TO CLOUDWATCH
+    # --------------------------------------
+
+    [OUTPUT]
+        Name                cloudwatch_logs
+        Match               node.systemd
+        region              us-east-1
+        log_group_name      /eks/node-systemd-logs
+        log_stream_prefix   systemd-
+        auto_create_group   true
+
+
+
+# ==========================================
+# Mount Host Paths
+# ==========================================
+
+daemonSetVolumes:
+
+  - name: varlog
+    hostPath:
+      path: /var/log
+
+
+  - name: systemd
+    hostPath:
+      path: /run/log/journal
+
+
+  - name: machine-id
+    hostPath:
+      path: /etc/machine-id
+
+
+daemonSetVolumeMounts:
+
+  - name: varlog
+    mountPath: /var/log
+
+
+  - name: systemd
+    mountPath: /run/log/journal
+    readOnly: true
+
+
+  - name: machine-id
+    mountPath: /etc/machine-id
+    readOnly: true
 ```
 **Install:**  
 ```bash
-helm install fluent-bit eks/aws-for-fluent-bit -f values.yaml -n kube-system
+helm upgrade --install aws-for-fluent-bit \
+eks/aws-for-fluent-bit \
+-n amazon-cloudwatch \
+--create-namespace \
+-f values.yaml
+```
+**verify**
+```bash
+kubectl get pods -n amazon-cloudwatch
 ```
 
 ## ✅ FINAL RESULT  
