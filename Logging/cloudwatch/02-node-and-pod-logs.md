@@ -267,11 +267,13 @@ kubectl logs -n amazon-cloudwatch <fluent-bit-pod>
  - /var/log/containers/*.log
 
 ## 📦 FINAL STORAGE STRATEGY  
-| Stage    | Storage                | Duration   |  
-| -------- | ---------------------- | ---------- |  
-| 🔥 Hot   | CloudWatch             | 15 days    |  
-| 🌤️ Warm | S3 STANDARD_IA         | 15–90 days |  
-| ❄️ Cold  | Glacier / Deep Archive | 90+ days   |  
+| Stage      | Service         | Duration     |
+| ---------- | --------------- | ------------ |
+| 🔥 Hot     | CloudWatch      | 0–15 days    |
+| 📦 Warm    | S3 STANDARD     | 0–90 days    |
+| 💾 Cooler  | S3 STANDARD_IA  | 90–180 days  |
+| ❄️ Cold    | S3 GLACIER      | 180–365 days |
+| 🧊 Archive | S3 DEEP_ARCHIVE | 365+ days    |
 
 ## 🚨 ZERO-MISS CHECKLIST  
 ✔ IRSA configured  
