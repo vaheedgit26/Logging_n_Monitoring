@@ -14,7 +14,7 @@ S3 Bucket (Lifecycle → IA → Glacier → Deep Archive)
 ```
 
 ## 1. Create IAM Role for Fluent Bit (IRSA)  
-**1.1 Create IAM Policy**  
+**1.1 Create IAM Policy`fluentbit-policy.json`**  
 ```json
 {
   "Version": "2012-10-17",
@@ -35,7 +35,7 @@ S3 Bucket (Lifecycle → IA → Glacier → Deep Archive)
 ```bash
 aws iam create-policy \
   --policy-name FluentBitCloudWatchPolicy \
-  --policy-document file://policy.json
+  --policy-document file://fluentbit-policy.json
 ```
 **1.2 Create IAM Role (IRSA)**  
 ```bash
