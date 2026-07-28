@@ -262,7 +262,8 @@ config:
         Tag               kube.*
         Path              /var/log/containers/*.log
         Parser            docker
-        DB                /var/log/flb_kube.db
+        DB                /var/lib/fluent-bit/flb_kube.db
+        # DB                /var/log/flb_kube.db
         Mem_Buf_Limit     50MB
         Skip_Long_Lines   On
         Refresh_Interval  10
