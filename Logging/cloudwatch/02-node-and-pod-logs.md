@@ -102,16 +102,22 @@ Create Policy `firehose.json`
 ```bash
 cat <<EOF > firehose.json
 {
-  "RoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/firehose-role",
-  "BucketARN": "arn:aws:s3:::my-eks-logs-bucket",
-  "Prefix": "logs/",
-  "BufferingHints": {
-    "SizeInMBs": 5,
-    "IntervalInSeconds": 300
-  },
-  "CompressionFormat": "GZIP"
+  "DeliveryStreamName": "eks-logs-firehose",
+  "DeliveryStreamType": "DirectPut",
+  "ExtendedS3DestinationConfiguration": {
+    "RoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/firehose-role",
+    "BucketARN": "arn:aws:s3:::my-eks-logs-bucket",
+    "Prefix": "logs/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/",
+    "ErrorOutputPrefix": "errors/",
+    "BufferingHints": {
+      "SizeInMBs": 5,
+      "IntervalInSeconds": 300
+    },
+    "CompressionFormat": "GZIP"
+  }
 }
 EOF
+
 ```
 
 ```bash
