@@ -30,7 +30,8 @@ aws s3api create-bucket \
 | -------- | ---------------------- | ---------- |  
 | 🔥 Hot   | CloudWatch             | 15 days    |  
 | 🌤️ Warm | S3 STANDARD_IA         | 15–90 days |  
-| ❄️ Cold  | Glacier / Deep Archive | 90+ days   |  
+| ❄️ Cold  | Glacier / Deep Archive | 90+ days   | 
+
 `lifecycle.json` 
 ```bash
 cat <<EOF > lifecycle.json
