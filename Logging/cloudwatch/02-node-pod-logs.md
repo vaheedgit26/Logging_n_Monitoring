@@ -89,6 +89,7 @@ eksctl create iamserviceaccount \
 ```
 
 ## STEP 4 — Create Firehose (CloudWatch → S3)  
+Create Policy `firehose.json`
 ```bash
 cat <<EOF > firehose.json
 {
