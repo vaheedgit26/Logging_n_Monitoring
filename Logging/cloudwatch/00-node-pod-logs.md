@@ -411,11 +411,10 @@ daemonSetVolumeMounts:
 ```
 **Install:**  
 ```bash
-helm upgrade --install aws-for-fluent-bit \
-eks/aws-for-fluent-bit \
--n amazon-cloudwatch \
---create-namespace \
--f values.yaml
+helm upgrade --install aws-for-fluent-bit eks/aws-for-fluent-bit \
+  -n amazon-cloudwatch \
+  --create-namespace \
+  -f values.yaml
 ```
 **verify**
 ```bash
