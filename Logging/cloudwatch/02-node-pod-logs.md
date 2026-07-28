@@ -26,7 +26,7 @@ aws s3api create-bucket \
 ```
 
 ## STEP 2 — Add Lifecycle Policy 
-`log-lifecycle.json` 
+`lifecycle.json` 
 ```bash
 cat <<EOF > lifecycle.json
 {
