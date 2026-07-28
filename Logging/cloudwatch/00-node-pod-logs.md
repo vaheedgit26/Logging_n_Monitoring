@@ -309,7 +309,6 @@ helm repo update
 rbac:
   create: true
 
-
 # ======================================================
 # Service Account
 # ======================================================
@@ -325,8 +324,6 @@ serviceAccount:
   # annotations:
   #   eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/fluent-bit-cloudwatch-role
 
-
-
 # ======================================================
 # Run Fluent Bit on every node
 # ======================================================
@@ -334,14 +331,9 @@ serviceAccount:
 tolerations:
   - operator: Exists
 
-
 # Required for node/systemd log collection
-
 hostNetwork: true
-
 dnsPolicy: ClusterFirstWithHostNet
-
-
 
 # ======================================================
 # Fluent Bit Configuration
@@ -371,7 +363,6 @@ config:
 
   inputs: |
 
-
     # --------------------------------------------------
     # 1. POD LOGS
     # --------------------------------------------------
@@ -385,7 +376,6 @@ config:
     #
 
     [INPUT]
-
         Name              tail
         Tag               kube.*
         Path              /var/log/containers/*.log
