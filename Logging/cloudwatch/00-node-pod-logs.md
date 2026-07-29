@@ -112,7 +112,7 @@ aws logs put-retention-policy \
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
 ```
-`values.yaml` **(IMPORTANT — includes node logs)**  
+**`values.yaml` (IMPORTANT — includes node logs)**  
 ```yaml
 input:
   enabled: false
