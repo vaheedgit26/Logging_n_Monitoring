@@ -306,8 +306,7 @@ config:
 
         Logstash_Format     On
         Logstash_Prefix     node-logs
-        Logstash_Prefix_Key kubernetes['namespace_name']
-
+        
         Retry_Limit         False
         Replace_Dots        On
 
@@ -323,8 +322,7 @@ config:
 
         Logstash_Format     On
         Logstash_Prefix     systemd-logs
-        Logstash_Prefix_Key kubernetes['namespace_name']
-
+        
         Retry_Limit         False
         Replace_Dots        On
 
