@@ -154,8 +154,8 @@ tolerations:
   - operator: Exists
 
 # Required for node/systemd log collection
- hostNetwork: true
- dnsPolicy: ClusterFirstWithHostNet
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
 
 # Requests and Limits
 resources:
