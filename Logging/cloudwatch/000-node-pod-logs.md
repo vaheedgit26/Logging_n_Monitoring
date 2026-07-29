@@ -124,17 +124,14 @@ cloudWatchLogs:
 # dnsPolicy: ClusterFirst
 
 # ======================================================
-# RBAC
-# Required for Kubernetes metadata enrichment
+# RBAC (needed for Kubernetes metadata)
 # ======================================================
 
 rbac:
   create: true
 
 # ======================================================
-# Service Account
-# ======================================================
-# For production add IRSA annotation
+# Service Account (use IRSA in production)
 # ======================================================
 
 serviceAccount:
@@ -147,9 +144,8 @@ serviceAccount:
   #   eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/fluent-bit-cloudwatch-role
 
 # ======================================================
-# Run Fluent Bit on every node
+# Scheduling (run Fluent Bit on all nodes)
 # ======================================================
-
 tolerations:
   - operator: Exists
 
@@ -157,7 +153,9 @@ tolerations:
 hostNetwork: true
 dnsPolicy: ClusterFirstWithHostNet
 
-# Requests and Limits
+# ======================================================
+# Resources
+# ======================================================
 resources:
   limits:
     memory: 200Mi
@@ -172,9 +170,9 @@ resources:
 
 config:
 
-  # ----------------------------------------------------
+  # ====================================================
   # SERVICE
-  # ----------------------------------------------------
+  # ====================================================
 
   service: |
 
@@ -188,6 +186,11 @@ config:
         HTTP_Listen               0.0.0.0
         HTTP_PORT                 2020
 
+       # storage.path              /var/lib/fluent-bit/storage
+       # storage.sync              normal
+       # storage.checksum          off
+       # storage.backlog.mem_limit 50M
+
   # ====================================================
   # INPUTS
   # ====================================================
@@ -197,14 +200,9 @@ config:
     # --------------------------------------------------
     # 1. POD LOGS
     # --------------------------------------------------
-    #
-    # Source:
-    # /var/log/containers/*.log
-    #
+    # Source: /var/log/containers/*.log
     # Kubernetes application stdout/stderr logs
-    #
     # EKS uses containerd, therefore CRI parser
-    #
 
     [INPUT]
         Name              tail
@@ -220,17 +218,9 @@ config:
     # --------------------------------------------------
     # 2. NODE OS LOGS
     # --------------------------------------------------
-    #
-    # Amazon Linux:
-    #
-    # /var/log/messages
-    #
-    # Contains:
-    # kernel
-    # OS events
-    # system messages
-    #
-
+    # Amazon Linux: /var/log/messages
+    # Contains: kernel, OS events, system messages
+    
     [INPUT]
         Name              tail
         Tag               node.messages
@@ -243,17 +233,9 @@ config:
     # --------------------------------------------------
     # 3. SYSTEMD JOURNAL LOGS
     # --------------------------------------------------
-    #
-    # Collect:
-    #
-    # kubelet
-    # containerd
-    #
-    # from:
-    #
-    # /run/log/journal
-    #
-
+    # Collect: kubelet, containerd
+    # from: /run/log/journal
+   
     [INPUT]
         Name              systemd
         Tag               node.systemd
@@ -272,14 +254,8 @@ config:
     # Kubernetes Metadata
     # --------------------------------------------------
     #
-    # Adds:
-    #
-    # namespace
-    # pod name
-    # container name
-    # labels
-    #
-
+    # Adds: namespace, pod name, container name and labels
+    
     [FILTER]
         Name                kubernetes
         Match               kube.*
@@ -297,8 +273,7 @@ config:
   outputs: |
 
     # --------------------------------------------------
-    # POD LOGS
-    # Fluent Bit --> CloudWatch
+    # POD LOGS (Fluent Bit --> CloudWatch)
     # --------------------------------------------------
 
     [OUTPUT]
@@ -309,10 +284,9 @@ config:
         log_stream_prefix   pod-${HOSTNAME}-
         auto_create_group   true
 
-    # --------------------------------------------------
-    # NODE /var/log/messages
-    # Fluent Bit --> CloudWatch
-    # --------------------------------------------------
+    # -------------------------------------------------------
+    # NODE LOGS /var/log/messages (Fluent Bit --> CloudWatch)
+    # -------------------------------------------------------
 
     [OUTPUT]
         Name                cloudwatch_logs
@@ -322,10 +296,9 @@ config:
         log_stream_prefix   node-${HOSTNAME}-
         auto_create_group   true
 
-    # --------------------------------------------------
-    # SYSTEMD LOGS
-    # Fluent Bit --> CloudWatch
-    # --------------------------------------------------
+    # -------------------------------------------------------------
+    # SYSTEMD LOGS (kubelet + containerd) Fluent Bit --> CloudWatch
+    # -------------------------------------------------------------
 
     [OUTPUT]
         Name                cloudwatch_logs
