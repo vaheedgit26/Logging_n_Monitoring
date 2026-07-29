@@ -134,6 +134,7 @@ aws firehose create-delivery-stream --cli-input-json file://firehose.json
 ```bash
 aws logs create-log-group --log-group-name "/eks/pod-logs"
 aws logs create-log-group --log-group-name "/eks/node-logs"
+aws logs create-log-group --log-group-name "/eks/node-systemd-logs"
 ```
 **Set retention:**  
 ```bash
@@ -143,6 +144,10 @@ aws logs put-retention-policy \
 
 aws logs put-retention-policy \
   --log-group-name "/eks/node-logs" \
+  --retention-in-days 15
+
+aws logs put-retention-policy \
+  --log-group-name "/eks/node-systemd-logs" \
   --retention-in-days 15
 ```
 
