@@ -308,8 +308,8 @@ input:
 cloudWatchLogs:
   enabled: false
 
-hostNetwork: false
-dnsPolicy: ClusterFirst
+# hostNetwork: false
+# dnsPolicy: ClusterFirst
 
 # ======================================================
 # RBAC
@@ -342,8 +342,8 @@ tolerations:
   - operator: Exists
 
 # Required for node/systemd log collection
-# hostNetwork: true
-# dnsPolicy: ClusterFirstWithHostNet
+ hostNetwork: true
+ dnsPolicy: ClusterFirstWithHostNet
 
 # ======================================================
 # Fluent Bit Configuration
