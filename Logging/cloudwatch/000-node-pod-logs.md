@@ -90,6 +90,7 @@ serviceAccount:
 ```bash
 aws logs create-log-group --log-group-name "/eks/pod-logs"
 aws logs create-log-group --log-group-name "/eks/node-logs"
+aws logs create-log-group --log-group-name "/eks/node-systemd-logs"
 ```
 **Set retention:**   
 ```bash
