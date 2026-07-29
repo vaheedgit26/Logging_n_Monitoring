@@ -309,6 +309,17 @@ config:
         log_stream_prefix   systemd-${HOSTNAME}-
         auto_create_group   true
 
+    # -------------------------------------------------------------
+    # ALL LOGS (Fluent Bit --> KINESIS FIREHOSE)
+    # -------------------------------------------------------------
+
+    #[OUTPUT]
+    # Name            kinesis_firehose
+    # Match           *
+    # region          ap-south-1
+    # delivery_stream fluentbit-logs
+    # Retry_Limit     False
+
 # ======================================================
 # Host Volumes
 # ======================================================
