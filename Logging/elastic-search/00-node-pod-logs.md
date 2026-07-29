@@ -186,11 +186,11 @@ config:
         HTTP_Listen               0.0.0.0
         HTTP_PORT                 2020
 
-       storage.path              /var/lib/fluent-bit/storage
-       storage.sync              normal
-       storage.checksum          on
-       storage.backlog.mem_limit 50M
-       storage.total_limit_size  1G
+        storage.path              /var/lib/fluent-bit/storage
+        storage.sync              normal
+        storage.checksum          on
+        storage.backlog.mem_limit 50M
+        storage.total_limit_size  1G
 
   # ====================================================
   # INPUTS
@@ -215,6 +215,7 @@ config:
         Mem_Buf_Limit     50MB
         Skip_Long_Lines   On
         Refresh_Interval  10
+        storage.type      filesystem
 
     # --------------------------------------------------
     # 2. NODE OS LOGS
@@ -230,6 +231,7 @@ config:
         Mem_Buf_Limit     20MB
         Skip_Long_Lines   On
         Refresh_Interval  10
+        storage.type      filesystem
 
     # --------------------------------------------------
     # 3. SYSTEMD JOURNAL LOGS
@@ -244,6 +246,7 @@ config:
         Systemd_Filter    _SYSTEMD_UNIT=kubelet.service
         Systemd_Filter    _SYSTEMD_UNIT=containerd.service
         Read_From_Tail    On
+        storage.type      filesystem
 
   # ====================================================
   # FILTERS
