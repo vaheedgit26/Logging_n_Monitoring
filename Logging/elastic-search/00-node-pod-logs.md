@@ -365,6 +365,11 @@ daemonSetVolumes:
   - name: fluent-bit-state
     emptyDir: {}
 
+  # - name: fluent-bit-state
+  #   hostPath:
+  #     path: /var/lib/fluent-bit
+  #     type: DirectoryOrCreate
+
 # ======================================================
 # Volume Mounts inside Fluent Bit container
 # ======================================================
