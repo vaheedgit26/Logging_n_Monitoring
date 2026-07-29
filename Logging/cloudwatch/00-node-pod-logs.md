@@ -462,6 +462,7 @@ config:
         Name                kubernetes
         Match               kube.*
         Kube_URL            https://kubernetes.default.svc:443
+        Kube_Tag_Prefix     kube.var.log.containers.
         Merge_Log           On
         Keep_Log            Off
         Labels              On
