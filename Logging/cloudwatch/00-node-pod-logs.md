@@ -215,6 +215,7 @@ config:
         Mem_Buf_Limit     50MB
         Skip_Long_Lines   On
         Refresh_Interval  10
+        storage.type      filesystem
 
     # --------------------------------------------------
     # 2. NODE OS LOGS
@@ -230,6 +231,7 @@ config:
         Mem_Buf_Limit     20MB
         Skip_Long_Lines   On
         Refresh_Interval  10
+        storage.type      filesystem
 
     # --------------------------------------------------
     # 3. SYSTEMD JOURNAL LOGS
@@ -244,6 +246,7 @@ config:
         Systemd_Filter    _SYSTEMD_UNIT=kubelet.service
         Systemd_Filter    _SYSTEMD_UNIT=containerd.service
         Read_From_Tail    On
+        storage.type      filesystem
 
   # ====================================================
   # FILTERS
@@ -358,6 +361,12 @@ daemonSetVolumes:
 
   - name: fluent-bit-state
     emptyDir: {}
+
+  # - name: fluent-bit-state
+  #   hostPath:
+  #     path: /var/lib/fluent-bit
+  #     type: DirectoryOrCreate
+
 
 # ======================================================
 # Volume Mounts inside Fluent Bit container
