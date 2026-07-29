@@ -85,7 +85,28 @@ serviceAccount:
 ```
 **Now Fluent Bit gets AWS credentials automatically.**
 
-## ✅ STEP 2 — Install Fluent Bit (EKS)  
+## ✅ STEP 2 — CloudWatch Log Groups (15 days HOT)
+**Create Log-groups**   
+```bash
+aws logs create-log-group --log-group-name "/eks/pod-logs"
+aws logs create-log-group --log-group-name "/eks/node-logs"
+```
+**Set retention:**   
+```bash
+aws logs put-retention-policy \
+  --log-group-name "/eks/pod-logs" \
+  --retention-in-days 15
+
+aws logs put-retention-policy \
+  --log-group-name "/eks/node-logs" \
+  --retention-in-days 15
+
+aws logs put-retention-policy \
+  --log-group-name "/eks/node-systemd-logs" \
+  --retention-in-days 15
+```
+
+## ✅ STEP 3 — Install Fluent Bit (EKS)  
 ```bash
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
