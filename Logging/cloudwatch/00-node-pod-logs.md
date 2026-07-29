@@ -190,6 +190,7 @@ config:
        storage.sync              normal
        storage.checksum          on
        storage.backlog.mem_limit 50M
+       storage.total_limit_size  1G
 
   # ====================================================
   # INPUTS
