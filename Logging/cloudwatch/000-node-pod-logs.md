@@ -157,6 +157,15 @@ tolerations:
  hostNetwork: true
  dnsPolicy: ClusterFirstWithHostNet
 
+# Requests and Limits
+resources:
+  limits:
+    memory: 200Mi
+    cpu: 200m
+  requests:
+    memory: 100Mi
+    cpu: 100m
+
 # ======================================================
 # Fluent Bit Configuration
 # ======================================================
