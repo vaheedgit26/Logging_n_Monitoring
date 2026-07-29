@@ -186,10 +186,10 @@ config:
         HTTP_Listen               0.0.0.0
         HTTP_PORT                 2020
 
-       # storage.path              /var/lib/fluent-bit/storage
-       # storage.sync              normal
-       # storage.checksum          off
-       # storage.backlog.mem_limit 50M
+       storage.path              /var/lib/fluent-bit/storage
+       storage.sync              normal
+       storage.checksum          on
+       storage.backlog.mem_limit 50M
 
   # ====================================================
   # INPUTS
