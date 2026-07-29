@@ -302,6 +302,15 @@ helm repo update
 ```
 **values.yaml (IMPORTANT — includes node logs)**  
 ```yaml
+input:
+  enabled: false
+
+cloudWatchLogs:
+  enabled: false
+
+hostNetwork: false
+dnsPolicy: ClusterFirst
+
 # ======================================================
 # RBAC
 # Required for Kubernetes metadata enrichment
@@ -333,8 +342,8 @@ tolerations:
   - operator: Exists
 
 # Required for node/systemd log collection
-hostNetwork: true
-dnsPolicy: ClusterFirstWithHostNet
+# hostNetwork: true
+# dnsPolicy: ClusterFirstWithHostNet
 
 # ======================================================
 # Fluent Bit Configuration
