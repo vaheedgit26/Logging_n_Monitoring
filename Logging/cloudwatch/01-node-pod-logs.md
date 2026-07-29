@@ -21,6 +21,13 @@ S3 (lifecycle rules)
 ```bash
 aws s3 mb s3://my-eks-logs-bucket
 ```
+| Time      | Storage      |    
+| --------- | ------------ |    
+| 0–30 days | STANDARD     |    
+| 30+       | STANDARD_IA  |    
+| 90+       | GLACIER      |    
+| 180+      | DEEP_ARCHIVE |    
+
 ## ✅ STEP 2 — S3 Lifecycle Policy (YOUR REQUIREMENT)
 ⚠️ Note: First 30 days = STANDARD (default)  
 ```bash
