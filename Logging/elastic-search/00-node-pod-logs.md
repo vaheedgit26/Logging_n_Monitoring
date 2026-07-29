@@ -190,6 +190,7 @@ config:
        storage.sync              normal
        storage.checksum          on
        storage.backlog.mem_limit 50M
+       storage.total_limit_size  1G
 
   # ====================================================
   # INPUTS
@@ -273,40 +274,56 @@ config:
   outputs: |
 
     # --------------------------------------------------
-    # POD LOGS (Fluent Bit --> CloudWatch)
+    # POD LOGS (Fluent Bit --> ElasticSearsh)
     # --------------------------------------------------
 
     [OUTPUT]
-        Name                cloudwatch_logs
+        Name                es
         Match               kube.*
-        region              us-east-1
-        log_group_name      /eks/pod-logs
-        log_stream_prefix   pod-${HOSTNAME}-
-        auto_create_group   true
+        Host                elasticsearch.kube-logging.svc.cluster.local
+        Port                9200
 
-    # -------------------------------------------------------
-    # NODE LOGS /var/log/messages (Fluent Bit --> CloudWatch)
-    # -------------------------------------------------------
+        Logstash_Format     On
+        Logstash_Prefix     pod-logs
+        Logstash_Prefix_Key kubernetes['namespace_name']
+
+        Retry_Limit         False
+        Replace_Dots        On
+
+
+    # ----------------------------------------------------------
+    # NODE LOGS /var/log/messages (Fluent Bit --> ElasticSearsh)
+    # ----------------------------------------------------------
 
     [OUTPUT]
-        Name                cloudwatch_logs
+        Name                es
         Match               node.messages
-        region              us-east-1
-        log_group_name      /eks/node-logs
-        log_stream_prefix   node-${HOSTNAME}-
-        auto_create_group   true
+        Host                elasticsearch.kube-logging.svc.cluster.local
+        Port                9200
 
-    # -------------------------------------------------------------
-    # SYSTEMD LOGS (kubelet + containerd) Fluent Bit --> CloudWatch
-    # -------------------------------------------------------------
+        Logstash_Format     On
+        Logstash_Prefix     node-logs
+        Logstash_Prefix_Key kubernetes['namespace_name']
+
+        Retry_Limit         False
+        Replace_Dots        On
+
+    # ----------------------------------------------------------------
+    # SYSTEMD LOGS (kubelet + containerd) Fluent Bit --> ElasticSearsh
+    # ----------------------------------------------------------------
 
     [OUTPUT]
-        Name                cloudwatch_logs
+        Name                es
         Match               node.systemd
-        region              us-east-1
-        log_group_name      /eks/node-systemd-logs
-        log_stream_prefix   systemd-${HOSTNAME}-
-        auto_create_group   true
+        Host                elasticsearch.kube-logging.svc.cluster.local
+        Port                9200
+
+        Logstash_Format     On
+        Logstash_Prefix     systemd-logs
+        Logstash_Prefix_Key kubernetes['namespace_name']
+
+        Retry_Limit         False
+        Replace_Dots        On
 
 # ======================================================
 # Host Volumes
