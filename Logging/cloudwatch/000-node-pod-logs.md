@@ -296,7 +296,7 @@ config:
         Match               kube.*
         region              us-east-1
         log_group_name      /eks/pod-logs
-        log_stream_prefix   pod-
+        log_stream_prefix   pod-${HOSTNAME}-
         auto_create_group   true
 
     # --------------------------------------------------
@@ -309,7 +309,7 @@ config:
         Match               node.messages
         region              us-east-1
         log_group_name      /eks/node-logs
-        log_stream_prefix   node-
+        log_stream_prefix   node-${HOSTNAME}-
         auto_create_group   true
 
     # --------------------------------------------------
@@ -322,7 +322,7 @@ config:
         Match               node.systemd
         region              us-east-1
         log_group_name      /eks/node-systemd-logs
-        log_stream_prefix   systemd-
+        log_stream_prefix   systemd-${HOSTNAME}-
         auto_create_group   true
 
 # ======================================================
